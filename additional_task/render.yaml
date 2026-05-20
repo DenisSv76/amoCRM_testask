@@ -2,5 +2,6 @@ services:
   - type: web
     name: visits-dashboard
     env: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: additional_task/Dockerfile
     plan: free
+    buildContext: additional_task
