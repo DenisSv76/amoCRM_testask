@@ -3,7 +3,7 @@
     const endpoint = (function(){
         // извлекаем базовый URL из адреса самого скрипта
         const s = document.currentScript.src;
-        return s.replace(/\/track\.js(\?.*)?$/, '/api/track');
+        return s.replace(/\/track\.js(\?.*)?$/, '/track');
     })();
 
     function getDeviceType(ua) {

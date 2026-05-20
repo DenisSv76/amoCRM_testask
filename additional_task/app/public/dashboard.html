@@ -35,18 +35,18 @@
 
 <script>
     async function fetchHourly(hours){
-        const res = await fetch('/api/stats/hourly?hours=' + hours);
+        const res = await fetch('/stats/hourly?hours=' + hours);
         if (res.status === 401) { window.location.href = '/login'; return []; }
         return res.ok ? res.json() : [];
     }
     async function fetchCities(){
-        const res = await fetch('/api/stats/cities');
+        const res = await fetch('/stats/cities');
         if (res.status === 401) { window.location.href = '/login'; return []; }
         return res.ok ? res.json() : [];
     }
 
     document.getElementById('btnLogout').onclick = async function(){
-        await fetch('/api/logout', { method: 'POST' });
+        await fetch('/logout', { method: 'POST' });
         window.location.href = '/login';
     };
     document.getElementById('btnRefresh').onclick = loadCharts;

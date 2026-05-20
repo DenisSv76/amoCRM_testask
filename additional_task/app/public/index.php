@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // 1) Приём треков (публичный)
-if ($uri === '/api/track' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($uri === '/track' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $db = get_db();
     $data = json_decode(file_get_contents('php://input'), true) ?: [];
     $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? ($data['ip'] ?? null);
@@ -44,7 +44,7 @@ if ($uri === '/api/track' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // 2) Логин
-if ($uri === '/api/login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($uri === '/login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $db = get_db();
     $data = json_decode(file_get_contents('php://input'), true) ?: [];
     $username = $data['username'] ?? '';
@@ -63,7 +63,7 @@ if ($uri === '/api/login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // 2.1) Регистрация
-if ($uri === '/api/register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($uri === '/register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $db = get_db();
     $data = json_decode(file_get_contents('php://input'), true) ?: [];
     $username = trim($data['username'] ?? '');
@@ -94,7 +94,7 @@ if ($uri === '/api/register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // 3) Логаут
-if ($uri === '/api/logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($uri === '/logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION = [];
     session_destroy();
     echo json_encode(['ok' => true]);
@@ -102,7 +102,7 @@ if ($uri === '/api/logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // 4) Статистика по часам (требуется авторизация)
-if ($uri === '/api/stats/hourly' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+if ($uri === '/stats/hourly' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     auth_required();
     $db = get_db();
     $hours = intval($_GET['hours'] ?? 24);
@@ -153,7 +153,7 @@ if ($uri === '/api/stats/hourly' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 // 5) Распределение по городам (требуется авторизация)
-if ($uri === '/api/stats/cities' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+if ($uri === '/stats/cities' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     auth_required();
     $db = get_db();
     $stmt = $db->prepare("
