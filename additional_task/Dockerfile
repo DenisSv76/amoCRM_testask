@@ -1,6 +1,3 @@
-# Dockerfile только для локальной разработки (docker-compose не использует этот файл)
-# Для деплоя на Render используется Dockerfile.render в корне репозитория
-
 FROM php:8.4-fpm-bullseye
 
 RUN apt-get update && apt-get install -y \
@@ -8,12 +5,12 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_sqlite sqlite3 intl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY docker/prod/nginx.conf /etc/nginx/sites-available/default
-COPY docker/prod/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY docker/prod/entrypoint.sh /entrypoint.sh
+COPY additional_task/docker/prod/nginx.conf /etc/nginx/sites-available/default
+COPY additional_task/docker/prod/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY additional_task/docker/prod/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-COPY app /app
+COPY additional_task/app /app
 WORKDIR /app
 RUN mkdir -p /app/data && chmod 777 /app/data
 
