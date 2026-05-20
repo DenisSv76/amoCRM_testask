@@ -2,7 +2,7 @@ FROM php:8.4-fpm-bullseye
 
 RUN apt-get update && apt-get install -y \
     nginx supervisor libsqlite3-dev libzip-dev zip unzip \
-    && docker-php-ext-install pdo pdo_sqlite sqlite3 intl \
+    && docker-php-ext-install pdo intl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY additional_task/docker/prod/nginx.conf /etc/nginx/sites-available/default
