@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Visits Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <style>
+        body{font-family:Arial,Helvetica,sans-serif;padding:20px;background:#f7f9fc}
+        .controls{margin-bottom:12px}
+        .charts{display:flex;gap:20px;flex-wrap:wrap}
+        .card{background:#fff;border:1px solid #e6e9ef;padding:12px;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,0.03)}
+        canvas{max-width:100%}
+    </style>
+</head>
+<body>
+<h1>Visits Dashboard</h1>
+
+<div class="controls card">
+    <label>Hours: <input id="hours" type="number" value="24" min="1" max="168"></label>
+    <button id="btnRefresh">Refresh</button>
+    <button id="btnLogout" style="margin-left:12px;background:#cf1322;color:#fff;border:none;padding:6px 14px;border-radius:4px;cursor:pointer">Logout</button>
+    <span id="status" style="margin-left:12px;color:#666"></span>
+</div>
+
+<div class="charts">
+    <div class="card" style="flex:1 1 700px">
+        <h3>Hourly unique visits</h3>
+        <canvas id="hourChart" width="800" height="300"></canvas>
+    </div>
+    <div class="card" style="flex:1 1 320px">
+        <h3>Visits by city</h3>
+        <canvas id="cityChart" width="400" height="300"></canvas>
+    </div>
+</div>
+
+<script>
+    async function fetchHourly(hours){
+        const res = await fetch('/api/stats/hourly?hours=' + hours);
+        if (res.status === 401) { window.location.href = '/login'; return []; }
+        return res.ok ? res.json() : [];
+    }
+    async function fetchCities(){
+        const res = await fetch('/api/stats/cities');
+        if (res.status === 401) { window.location.href = '/login'; return []; }
+        return res.ok ? res.json() : [];
+    }
+
+    document.getElementById('btnLogout').onclick = async function(){
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login';
+    };
+    document.getElementById('btnRefresh').onclick = loadCharts;
+    async function loadCharts(){
+        document.getElementById('status').innerText = 'Loading...';
+        const hours = parseInt(document.getElementById('hours').value || '24', 10);
+        const hjson = await fetchHourly(hours);
+        const labels = hjson.map(r => r.hour);
+        const data = hjson.map(r => parseInt(r.unique_visits,10));
+
+        const cjson = await fetchCities();
+        const cityLabels = cjson.map(r => r.city);
+        const cityData = cjson.map(r => parseInt(r.cnt,10));
+
+        // hourly bar
+        const ctx = document.getElementById('hourChart').getContext('2d');
+        if (window.hourChart && typeof window.hourChart.destroy === 'function') window.hourChart.destroy();
+        window.hourChart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ label: 'Unique visits', data: data, backgroundColor: 'rgba(54,162,235,0.7)' }] },
+            options: {
+                scales: {
+                    x: { ticks: { autoSkip: true, maxTicksLimit: 24 } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+
+        // city pie
+        const ctx2 = document.getElementById('cityChart').getContext('2d');
+        if (window.cityChart && typeof window.cityChart.destroy === 'function') window.cityChart.destroy();
+        window.cityChart = new Chart(ctx2, {
+            type: 'pie',
+            data: { labels: cityLabels, datasets: [{ data: cityData, backgroundColor: cityLabels.map((_,i)=>`hsl(${(i*40)%360} 70% 60%)`) }] }
+        });
+
+        document.getElementById('status').innerText = 'Updated: ' + new Date().toLocaleString();
+    }
+
+    loadCharts();
+</script>
+</body>
+</html>

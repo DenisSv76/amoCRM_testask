@@ -1,0 +1,30 @@
+# compose.yaml
+services:
+  frankenphp:
+    build:
+      context: .
+    working_dir: /app
+    ports:
+      - "127.0.0.1:8080:8000" 
+    volumes:
+      - ./app:/app
+    container_name: frankenphp_lara_amo_point
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    ports:
+       - "127.0.0.1:6031:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+    container_name: mysql_lara_amo_point
+    restart: always
+    environment:
+      - "MYSQL_ROOT_PASSWORD=12345678"
+      - "MYSQL_DATABASE=amo_point"
+      - "MYSQL_USER=user_amo_point"
+      - "MYSQL_PASSWORD=12345678"
+
+volumes:
+  mysql:

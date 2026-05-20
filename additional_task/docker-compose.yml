@@ -1,0 +1,41 @@
+services:
+  nginx:
+    build:
+      context: ./docker/nginx
+    volumes:
+      - ./app:/app
+    container_name: docker_nginx_amocrm
+    restart: always
+    ports:
+      - "8086:80"
+    networks:
+      - code-network
+
+  php-fpm:
+    build:
+      context: ./docker/php-fpm
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./app:/app
+    container_name: docker_php_fpm_amocrm
+    networks:
+      - code-network
+
+  php-cli:
+    build:
+      context: ./docker/php-cli
+    volumes:
+      - ./app:/app
+    command: sleep 10000
+    container_name: docker_php_cli_amocrm
+    networks:
+      - code-network
+
+networks:
+  code-network:
+    driver: bridge
+
+volumes:
+  mysql:
+
